@@ -5,8 +5,8 @@ import com.wws.mysqlclient.config.MysqlConfig;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import com.wws.mysqlclient.packet.HandshakePacket;
-import com.wws.mysqlclient.packet.HandshakeResponsePacket;
+import com.wws.mysqlclient.packet.connection.HandshakeV10Packet;
+import com.wws.mysqlclient.packet.connection.HandshakeResponse41Packet;
 import com.wws.mysqlclient.packet.MysqlPacket;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @version 1.0.0
  * @date 2019-09-10 14:59
  **/
-public class HandshakeHandler extends SimpleChannelInboundHandler<HandshakePacket> {
+public class HandshakeHandler extends SimpleChannelInboundHandler<HandshakeV10Packet> {
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, HandshakePacket handshakePacket) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, HandshakeV10Packet handshakeV10Packet) throws Exception {
         AtomicInteger sequenceId = channelHandlerContext.channel().attr(AttributeKeys.SEQUENCE_ID_KEY).get();
 
         MysqlConfig config = channelHandlerContext.channel().attr(AttributeKeys.CONFIG_KEY).get();
-        ByteBuf payload = HandshakeResponsePacket.login(config, handshakePacket);
+        ByteBuf payload = HandshakeResponse41Packet.login(config, handshakeV10Packet);
         MysqlPacket mysqlPacket = new MysqlPacket((byte)sequenceId.incrementAndGet(), payload);
         ByteBuf byteBuf = mysqlPacket.write();
         channelHandlerContext.writeAndFlush(byteBuf);

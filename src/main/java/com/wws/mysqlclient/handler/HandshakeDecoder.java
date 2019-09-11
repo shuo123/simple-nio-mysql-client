@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.util.Attribute;
-import com.wws.mysqlclient.packet.HandshakePacket;
+import com.wws.mysqlclient.packet.connection.HandshakeV10Packet;
 import com.wws.mysqlclient.packet.MysqlPacket;
 
 import java.util.ArrayList;
@@ -21,27 +21,27 @@ public class HandshakeDecoder extends MessageToMessageDecoder<MysqlPacket> {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, MysqlPacket mysqlPacket, List<Object> list) throws Exception {
-        HandshakePacket handshakePacket = new HandshakePacket();
+        HandshakeV10Packet handshakeV10Packet = new HandshakeV10Packet();
         ByteBuf payload = mysqlPacket.getPayload();
-        handshakePacket.setProtocolVersion(payload.readByte());
-        handshakePacket.setServerVersion(new String(readUtilNul(payload)));
-        handshakePacket.setConnectionId(payload.readIntLE());
-        handshakePacket.setAuthPluginDataPart1(readBytes(payload, 8));
+        handshakeV10Packet.setProtocolVersion(payload.readByte());
+        handshakeV10Packet.setServerVersion(new String(readUtilNul(payload)));
+        handshakeV10Packet.setConnectionId(payload.readIntLE());
+        handshakeV10Packet.setAuthPluginDataPart1(readBytes(payload, 8));
         payload.skipBytes(1);
-        handshakePacket.setCapabilityFlagsLower(payload.readShortLE());
-        handshakePacket.setCharsetFlag(payload.readByte());
-        handshakePacket.setServerStatusFlag(payload.readShortLE());
-        handshakePacket.setCapabilityFlagsUpper(payload.readShortLE());
-        handshakePacket.setAuthPluginDataLength(payload.readByte());
-        handshakePacket.setReserved(readBytes(payload, 10));
-        handshakePacket.setAuthPluginDataPart2(readBytes(payload, Math.max(13, (int)handshakePacket.getAuthPluginDataLength() - 8)));
-        handshakePacket.setAuthPluginName(new String(readUtilNul(payload)));
+        handshakeV10Packet.setCapabilityFlagsLower(payload.readShortLE());
+        handshakeV10Packet.setCharsetFlag(payload.readByte());
+        handshakeV10Packet.setServerStatusFlag(payload.readShortLE());
+        handshakeV10Packet.setCapabilityFlagsUpper(payload.readShortLE());
+        handshakeV10Packet.setAuthPluginDataLength(payload.readByte());
+        handshakeV10Packet.setReserved(readBytes(payload, 10));
+        handshakeV10Packet.setAuthPluginDataPart2(readBytes(payload, Math.max(13, (int) handshakeV10Packet.getAuthPluginDataLength() - 8)));
+        handshakeV10Packet.setAuthPluginName(new String(readUtilNul(payload)));
 
         Attribute<AtomicInteger> sequenceId = channelHandlerContext.channel().attr(AttributeKeys.SEQUENCE_ID_KEY);
         sequenceId.setIfAbsent(new AtomicInteger(mysqlPacket.getSequenceId()));
 
-        System.out.println(handshakePacket);
-        list.add(handshakePacket);
+        System.out.println(handshakeV10Packet);
+        list.add(handshakeV10Packet);
     }
 
     private byte[] readUtilNul(ByteBuf byteBuf) {
