@@ -5,6 +5,7 @@ import com.wws.mysqlclient.enums.AttributeKeys;
 import com.wws.mysqlclient.handler.HandshakeDecoder;
 import com.wws.mysqlclient.handler.HandshakeHandler;
 import com.wws.mysqlclient.handler.MysqlPacketDecoder;
+import com.wws.mysqlclient.handler.OutboundPrintHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -35,7 +36,7 @@ public class MysqlClientBootstrap {
                     protected void initChannel(SocketChannel socketChannel){
                         socketChannel.pipeline().addLast(new MysqlPacketDecoder())
                                 .addLast(new HandshakeDecoder())
-//                                .addLast(new RecieveHandler())
+                                .addLast(new OutboundPrintHandler())
                                 .addLast(new HandshakeHandler());
                     }
                 }).connect("127.0.0.1", 3306)

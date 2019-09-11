@@ -13,7 +13,7 @@ public class MysqlTest {
 
     @Test
     public void test() throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3307?useSSL=false&allowPublicKeyRetrieval=true", "root", "root");
+        Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT", "root", "root");
         connection.close();
     }
 

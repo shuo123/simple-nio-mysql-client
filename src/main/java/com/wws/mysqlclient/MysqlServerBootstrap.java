@@ -1,6 +1,6 @@
 package com.wws.mysqlclient;
 
-import com.wws.mysqlclient.handler.RecieveHandler;
+import com.wws.mysqlclient.handler.InboundPrintHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -28,7 +28,7 @@ public class MysqlServerBootstrap {
                     @Override
                     protected void initChannel(SocketChannel socketChannel) throws Exception {
                         ChannelPipeline pipeline = socketChannel.pipeline();
-                        pipeline.addLast(new RecieveHandler());
+                        pipeline.addLast(new InboundPrintHandler());
                     }
                 });
         serverBootstrap.bind().addListener((future -> {

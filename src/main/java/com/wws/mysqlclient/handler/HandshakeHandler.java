@@ -9,8 +9,6 @@ import com.wws.mysqlclient.packet.connection.HandshakeV10Packet;
 import com.wws.mysqlclient.packet.connection.HandshakeResponse41Packet;
 import com.wws.mysqlclient.packet.MysqlPacket;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * 握手协议处理器
  *
@@ -21,12 +19,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HandshakeHandler extends SimpleChannelInboundHandler<HandshakeV10Packet> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, HandshakeV10Packet handshakeV10Packet) throws Exception {
-        AtomicInteger sequenceId = channelHandlerContext.channel().attr(AttributeKeys.SEQUENCE_ID_KEY).get();
+        Byte sequenceId = channelHandlerContext.channel().attr(AttributeKeys.SEQUENCE_ID_KEY).get();
+        sequenceId = (byte)(sequenceId + 1);
 
         MysqlConfig config = channelHandlerContext.channel().attr(AttributeKeys.CONFIG_KEY).get();
         ByteBuf payload = HandshakeResponse41Packet.login(config, handshakeV10Packet);
-        MysqlPacket mysqlPacket = new MysqlPacket((byte)sequenceId.incrementAndGet(), payload);
+        MysqlPacket mysqlPacket = new MysqlPacket(sequenceId, payload);
         ByteBuf byteBuf = mysqlPacket.write();
         channelHandlerContext.writeAndFlush(byteBuf);
+
+        channelHandlerContext.pipeline().remove(HandshakeHandler.class);
+        channelHandlerContext.pipeline().remove(HandshakeDecoder.class);
+        channelHandlerContext.pipeline().addLast(new AuthDecoder());
     }
 }

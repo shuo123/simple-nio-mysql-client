@@ -13,8 +13,11 @@ import lombok.Data;
  **/
 @Data
 public class ErrPacket {
-
-    private byte header;
+    /**
+     * 1
+     * 0xff
+     */
+    private byte header = (byte)0xff;
 
     private short errorCode;
 

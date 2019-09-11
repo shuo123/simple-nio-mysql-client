@@ -1,6 +1,8 @@
 package com.wws.mysqlclient.packet;
 
+import com.wws.mysqlclient.util.MysqlByteBufUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +20,14 @@ import java.nio.ByteBuffer;
 @AllArgsConstructor
 public class MysqlPacket {
 
+    /**
+     * 3
+     */
     private Integer payloadLength;
 
+    /**
+     * 1
+     */
     private byte sequenceId;
 
     private ByteBuf payload;
@@ -31,12 +39,12 @@ public class MysqlPacket {
     }
 
     public ByteBuf write(){
-        ByteBuffer byteBuffer = ByteBuffer.allocate(5);
-        ByteBuf header = Unpooled.wrappedBuffer(byteBuffer);
-        header.writerIndex(0);
-        header.writeIntLE(payloadLength);
+        ByteBuf header = ByteBufAllocator.DEFAULT.buffer(4);
+        MysqlByteBufUtil.writePacketLen(header, payloadLength);
         header.writeByte(sequenceId);
         return Unpooled.wrappedBuffer(header, payload);
     }
+
+
 
 }

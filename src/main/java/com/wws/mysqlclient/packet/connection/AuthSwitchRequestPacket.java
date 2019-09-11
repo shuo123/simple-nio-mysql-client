@@ -18,7 +18,7 @@ public class AuthSwitchRequestPacket {
      * 1
      * 0xfe
      */
-    private byte status;
+    private byte status = (byte)0xfe;
 
     /**
      * string.NUL
