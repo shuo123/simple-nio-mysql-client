@@ -1,13 +1,11 @@
 package com.wws.mysqlclient.packet;
 
-import com.wws.mysqlclient.util.MysqlByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.nio.ByteBuffer;
+import lombok.NoArgsConstructor;
 
 /**
  * mysql报文
@@ -17,8 +15,8 @@ import java.nio.ByteBuffer;
  * @date 2019-09-09 16:42
  **/
 @Data
-@AllArgsConstructor
-public class MysqlPacket {
+@NoArgsConstructor
+public class MysqlPacket implements BaseSeriablizablePacket {
 
     /**
      * 3
@@ -38,9 +36,17 @@ public class MysqlPacket {
         this.payloadLength = payload.readableBytes();
     }
 
+    @Override
+    public void read(ByteBuf byteBuf) {
+        this.setPayloadLength(byteBuf.readMediumLE());
+        this.setSequenceId(byteBuf.readByte());
+        this.setPayload(byteBuf.readBytes(this.getPayloadLength()));
+    }
+
+    @Override
     public ByteBuf write(){
         ByteBuf header = ByteBufAllocator.DEFAULT.buffer(4);
-        MysqlByteBufUtil.writePacketLen(header, payloadLength);
+        header.writeMediumLE(payloadLength);
         header.writeByte(sequenceId);
         return Unpooled.wrappedBuffer(header, payload);
     }

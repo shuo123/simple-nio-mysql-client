@@ -1,5 +1,8 @@
 package com.wws.mysqlclient.packet.connection;
 
+import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.Data;
 
 /**
@@ -12,11 +15,20 @@ import lombok.Data;
  * @date 2019-09-11 11:22
  **/
 @Data
-public class AuthSwitchResponsePacket {
+public class AuthSwitchResponsePacket implements BaseSeriablizablePacket {
 
     /**
      * string.EOF
      */
-    private String authPluginResponse;
+    private byte[] authPluginResponse;
 
+    @Override
+    public void read(ByteBuf byteBuf) {
+
+    }
+
+    @Override
+    public ByteBuf write() {
+        return Unpooled.wrappedBuffer(authPluginResponse);
+    }
 }

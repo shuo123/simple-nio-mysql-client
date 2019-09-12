@@ -2,16 +2,16 @@ package com.wws.mysqlclient;
 
 import com.wws.mysqlclient.config.MysqlConfig;
 import com.wws.mysqlclient.enums.AttributeKeys;
-import com.wws.mysqlclient.handler.HandshakeDecoder;
-import com.wws.mysqlclient.handler.HandshakeHandler;
-import com.wws.mysqlclient.handler.MysqlPacketDecoder;
-import com.wws.mysqlclient.handler.OutboundPrintHandler;
+import com.wws.mysqlclient.handler.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+
+import java.nio.ByteOrder;
 
 /**
  * @author wws
@@ -33,11 +33,17 @@ public class MysqlClientBootstrap {
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel socketChannel){
-                        socketChannel.pipeline().addLast(new MysqlPacketDecoder())
-                                .addLast(new HandshakeDecoder())
+                    protected void initChannel(SocketChannel socketChannel) {
+                        socketChannel.pipeline()
+                                .addLast(new LengthFieldBasedFrameDecoder(ByteOrder.LITTLE_ENDIAN, 16 * 1024 * 1024, 0, 3, 1, 0, true))
+                                .addLast(new MysqlPacketEecoder())
+                                .addLast(new BaseSerialablePacketEncoder())
                                 .addLast(new OutboundPrintHandler())
-                                .addLast(new HandshakeHandler());
+                                .addLast(new MysqlPacketDecoder())
+                                .addLast(new HandshakeDecoder())
+                                .addLast(new InboundPrintHandler())
+                                .addLast(new HandshakeHandler())
+                                ;
                     }
                 }).connect("127.0.0.1", 3306)
                 .addListener(future -> {

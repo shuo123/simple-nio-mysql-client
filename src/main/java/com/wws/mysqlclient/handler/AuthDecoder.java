@@ -4,7 +4,6 @@ import com.wws.mysqlclient.packet.MysqlPacket;
 import com.wws.mysqlclient.packet.connection.AuthSwitchRequestPacket;
 import com.wws.mysqlclient.packet.generic.ErrPacket;
 import com.wws.mysqlclient.packet.generic.OKPacket;
-import com.wws.mysqlclient.util.MysqlByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -22,27 +21,21 @@ public class AuthDecoder extends MessageToMessageDecoder<MysqlPacket> {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, MysqlPacket mysqlPacket, List<Object> list) throws Exception {
         ByteBuf payload = mysqlPacket.getPayload();
-        byte header = payload.readByte();
+        byte header = payload.getByte(payload.readerIndex());
         if((byte)0xff == header){
             ErrPacket errPacket = new ErrPacket();
-            errPacket.setErrorCode(payload.readShortLE());
-            errPacket.setSqlState(new String(MysqlByteBufUtil.readNByte(payload,1)));
-            errPacket.setSqlStateMarker(new String(MysqlByteBufUtil.readNByte(payload,5)));
-            errPacket.setErrorMessage(new String(MysqlByteBufUtil.readUtilEOF(payload)));
+            errPacket.read(payload);
+            System.out.println(errPacket);
             list.add(errPacket);
         }else if((byte)0 == header) {
             OKPacket okPacket = new OKPacket();
-            okPacket.setHeader(header);
-            okPacket.setAffectRow(MysqlByteBufUtil.readLengthEncodedInteger(payload));
-            okPacket.setLastInsertId(MysqlByteBufUtil.readLengthEncodedInteger(payload));
-            okPacket.setStatusFlags(payload.readShortLE());
-            okPacket.setWarnings(payload.readShortLE());
-            okPacket.setInfo(new String(MysqlByteBufUtil.readUtilEOF(payload)));
+            okPacket.read(payload);
+            System.out.println(okPacket);
             list.add(okPacket);
         }else if((byte)0xfe == header){
             AuthSwitchRequestPacket authSwitchRequestPacket = new AuthSwitchRequestPacket();
-            authSwitchRequestPacket.setAuthMethodName(new String(MysqlByteBufUtil.readUtilNUL(payload)));
-            authSwitchRequestPacket.setAuthMethodData(new String(MysqlByteBufUtil.readUtilEOF(payload)));
+            authSwitchRequestPacket.read(payload);
+            System.out.println(authSwitchRequestPacket);
             list.add(authSwitchRequestPacket);
         }else{
             System.out.println("error....,"+ payload);

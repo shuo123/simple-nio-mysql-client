@@ -110,19 +110,4 @@ public class MysqlByteBufUtil {
         byteBuf.writeByte((byte) 0);
     }
 
-    /**
-     * 写入头部的报文长度
-     *
-     * @param byteBuf ByteBuf
-     * @param packetLen 报文长度
-     */
-    public static void writePacketLen(ByteBuf byteBuf, int packetLen){
-        byte b1 = (byte)(packetLen >> 16);
-        byte b2 = (byte)((packetLen & 0xff00) >> 8);
-        byte b3 = (byte)(packetLen & 0xff);
-        byteBuf.writeByte(b3);
-        byteBuf.writeByte(b2);
-        byteBuf.writeByte(b1);
-    }
-
 }

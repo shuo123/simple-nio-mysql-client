@@ -1,5 +1,8 @@
 package com.wws.mysqlclient.packet.connection;
 
+import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
+import com.wws.mysqlclient.util.MysqlByteBufUtil;
+import io.netty.buffer.ByteBuf;
 import lombok.Data;
 
 /**
@@ -12,7 +15,7 @@ import lombok.Data;
  * @date 2019-09-09 14:46
  **/
 @Data
-public class HandshakeV10Packet {
+public class HandshakeV10Packet implements BaseSeriablizablePacket {
 
     /**
      * 1
@@ -73,4 +76,26 @@ public class HandshakeV10Packet {
      * string[NUL]
      */
     private String authPluginName;
+
+    @Override
+    public void read(ByteBuf byteBuf) {
+        this.setProtocolVersion(byteBuf.readByte());
+        this.setServerVersion(new String(MysqlByteBufUtil.readUtilNUL(byteBuf)));
+        this.setConnectionId(byteBuf.readIntLE());
+        this.setAuthPluginDataPart1(MysqlByteBufUtil.readNByte(byteBuf, 8));
+        byteBuf.skipBytes(1);
+        this.setCapabilityFlagsLower(byteBuf.readShortLE());
+        this.setCharsetFlag(byteBuf.readByte());
+        this.setServerStatusFlag(byteBuf.readShortLE());
+        this.setCapabilityFlagsUpper(byteBuf.readShortLE());
+        this.setAuthPluginDataLength(byteBuf.readByte());
+        this.setReserved(MysqlByteBufUtil.readNByte(byteBuf, 10));
+        this.setAuthPluginDataPart2(MysqlByteBufUtil.readNByte(byteBuf, Math.max(13, (int) this.getAuthPluginDataLength() - 8)));
+        this.setAuthPluginName(new String(MysqlByteBufUtil.readUtilNUL(byteBuf)));
+    }
+
+    @Override
+    public ByteBuf write() {
+        return null;
+    }
 }

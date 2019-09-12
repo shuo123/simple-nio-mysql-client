@@ -1,5 +1,8 @@
 package com.wws.mysqlclient.packet.connection;
 
+import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
+import com.wws.mysqlclient.util.MysqlByteBufUtil;
+import io.netty.buffer.ByteBuf;
 import lombok.Data;
 
 /**
@@ -12,7 +15,7 @@ import lombok.Data;
  * @date 2019-09-11 11:16
  **/
 @Data
-public class AuthSwitchRequestPacket {
+public class AuthSwitchRequestPacket implements BaseSeriablizablePacket {
 
     /**
      * 1
@@ -28,6 +31,17 @@ public class AuthSwitchRequestPacket {
     /**
      * string.EOF
      */
-    private String authMethodData;
+    private byte[] authMethodData;
 
+    @Override
+    public void read(ByteBuf byteBuf) {
+        this.setStatus(byteBuf.readByte());
+        this.setAuthMethodName(new String(MysqlByteBufUtil.readUtilNUL(byteBuf)));
+        this.setAuthMethodData(MysqlByteBufUtil.readUtilEOF(byteBuf));
+    }
+
+    @Override
+    public ByteBuf write() {
+        return null;
+    }
 }

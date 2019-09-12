@@ -19,17 +19,14 @@ import com.wws.mysqlclient.packet.MysqlPacket;
 public class HandshakeHandler extends SimpleChannelInboundHandler<HandshakeV10Packet> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, HandshakeV10Packet handshakeV10Packet) throws Exception {
-        Byte sequenceId = channelHandlerContext.channel().attr(AttributeKeys.SEQUENCE_ID_KEY).get();
-        sequenceId = (byte)(sequenceId + 1);
 
         MysqlConfig config = channelHandlerContext.channel().attr(AttributeKeys.CONFIG_KEY).get();
-        ByteBuf payload = HandshakeResponse41Packet.login(config, handshakeV10Packet);
-        MysqlPacket mysqlPacket = new MysqlPacket(sequenceId, payload);
-        ByteBuf byteBuf = mysqlPacket.write();
-        channelHandlerContext.writeAndFlush(byteBuf);
+        HandshakeResponse41Packet handshakeResponsePacket = HandshakeResponse41Packet.getHandshakeResponsePacket(config, handshakeV10Packet);
+        channelHandlerContext.writeAndFlush(handshakeResponsePacket);
 
         channelHandlerContext.pipeline().remove(HandshakeHandler.class);
         channelHandlerContext.pipeline().remove(HandshakeDecoder.class);
         channelHandlerContext.pipeline().addLast(new AuthDecoder());
+        channelHandlerContext.pipeline().addLast(new AuthSwitchHandler());
     }
 }

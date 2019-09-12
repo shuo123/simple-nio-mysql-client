@@ -3,8 +3,6 @@ package com.wws.mysqlclient.enums;
 import com.wws.mysqlclient.config.MysqlConfig;
 import io.netty.util.AttributeKey;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
  * @author wws
  * @version 1.0.0
@@ -13,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AttributeKeys {
 
     public static final AttributeKey<Byte> SEQUENCE_ID_KEY = AttributeKey.newInstance("sequenceId");
-    public static final AttributeKey<Byte> STATUS_KEY = AttributeKey.newInstance("status");
-    public static final AttributeKey<MysqlConfig> CONFIG_KEY = AttributeKey.newInstance("com/wws/mysqlclient/config");
+    public static final AttributeKey<MysqlConfig> CONFIG_KEY = AttributeKey.newInstance("config");
 
 }

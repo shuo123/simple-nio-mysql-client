@@ -1,9 +1,11 @@
 package com.wws.mysqlclient.handler;
 
+import com.wws.mysqlclient.enums.AttributeKeys;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import com.wws.mysqlclient.packet.MysqlPacket;
+import io.netty.util.Attribute;
 
 import java.util.List;
 
@@ -16,26 +18,13 @@ import java.util.List;
  **/
 public class MysqlPacketDecoder extends ByteToMessageDecoder {
 
-    private final int HEADER_LEN = 4;
-
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        if(byteBuf.readableBytes() > HEADER_LEN){
-            byte[] bytes = new byte[HEADER_LEN];
-            byteBuf.getBytes(byteBuf.readerIndex(), bytes);
-            int payloadLen = getPayloadLen(bytes);
-            if(byteBuf.readableBytes() >= HEADER_LEN + payloadLen){
-                byteBuf.skipBytes(4);
-                MysqlPacket mysqlPacket = new MysqlPacket(payloadLen, bytes[3], byteBuf.readBytes(payloadLen));
-                list.add(mysqlPacket);
-            }
-        }
-    }
+        MysqlPacket mysqlPacket = new MysqlPacket();
+        mysqlPacket.read(byteBuf);
+        list.add(mysqlPacket);
 
-    private int getPayloadLen(byte[] bytes){
-        int len = bytes[0];
-        len += bytes[1] << 8;
-        len += bytes[2] << 16;
-        return len;
+        Attribute<Byte> sequenceId = channelHandlerContext.channel().attr(AttributeKeys.SEQUENCE_ID_KEY);
+        sequenceId.set(mysqlPacket.getSequenceId());
     }
 }

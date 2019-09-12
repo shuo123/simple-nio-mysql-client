@@ -1,5 +1,8 @@
 package com.wws.mysqlclient.packet.generic;
 
+import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
+import com.wws.mysqlclient.util.MysqlByteBufUtil;
+import io.netty.buffer.ByteBuf;
 import lombok.Data;
 
 /**
@@ -15,7 +18,7 @@ import lombok.Data;
  * @date 2019-09-11 10:37
  **/
 @Data
-public class OKPacket {
+public class OKPacket implements BaseSeriablizablePacket {
 
     /**
      * INT <1>
@@ -53,4 +56,18 @@ public class OKPacket {
      */
     private String info;
 
+    @Override
+    public void read(ByteBuf byteBuf) {
+        this.setHeader(byteBuf.readByte());
+        this.setAffectRow(MysqlByteBufUtil.readLengthEncodedInteger(byteBuf));
+        this.setLastInsertId(MysqlByteBufUtil.readLengthEncodedInteger(byteBuf));
+        this.setStatusFlags(byteBuf.readShortLE());
+        this.setWarnings(byteBuf.readShortLE());
+        this.setInfo(new String(MysqlByteBufUtil.readUtilEOF(byteBuf)));
+    }
+
+    @Override
+    public ByteBuf write() {
+        return null;
+    }
 }
