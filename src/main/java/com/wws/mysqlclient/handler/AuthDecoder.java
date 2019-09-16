@@ -18,21 +18,27 @@ import java.util.List;
  * @date 2019-09-11 14:44
  **/
 public class AuthDecoder extends MessageToMessageDecoder<MysqlPacket> {
+
+    private static final short ERR_HEADER = 0XFF;
+    private static final short OK_HEADER = 0X00;
+    private static final short AUTH_SWITCH_HEADER = 0XFE;
+
+
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, MysqlPacket mysqlPacket, List<Object> list) throws Exception {
+    protected void decode(ChannelHandlerContext channelHandlerContext, MysqlPacket mysqlPacket, List<Object> list) {
         ByteBuf payload = mysqlPacket.getPayload();
-        byte header = payload.getByte(payload.readerIndex());
-        if((byte)0xff == header){
+        short header = payload.getUnsignedByte(payload.readerIndex());
+        if(ERR_HEADER == header){
             ErrPacket errPacket = new ErrPacket();
             errPacket.read(payload);
             System.out.println(errPacket);
             list.add(errPacket);
-        }else if((byte)0 == header) {
+        }else if(OK_HEADER == header) {
             OKPacket okPacket = new OKPacket();
             okPacket.read(payload);
             System.out.println(okPacket);
             list.add(okPacket);
-        }else if((byte)0xfe == header){
+        }else if(AUTH_SWITCH_HEADER == header){
             AuthSwitchRequestPacket authSwitchRequestPacket = new AuthSwitchRequestPacket();
             authSwitchRequestPacket.read(payload);
             System.out.println(authSwitchRequestPacket);

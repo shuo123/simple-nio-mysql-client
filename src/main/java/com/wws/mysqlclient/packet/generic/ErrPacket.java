@@ -20,9 +20,9 @@ public class ErrPacket implements BaseSeriablizablePacket {
      * 1
      * 0xff
      */
-    private byte header = (byte)0xff;
+    private short header = 0xff;
 
-    private short errorCode;
+    private int errorCode;
 
     private String sqlStateMarker;
 
@@ -32,8 +32,8 @@ public class ErrPacket implements BaseSeriablizablePacket {
 
     @Override
     public void read(ByteBuf byteBuf) {
-        this.setHeader(byteBuf.readByte());
-        this.setErrorCode(byteBuf.readShortLE());
+        this.setHeader(byteBuf.readUnsignedByte());
+        this.setErrorCode(byteBuf.readUnsignedShortLE());
         this.setSqlState(new String(MysqlByteBufUtil.readNByte(byteBuf,1)));
         this.setSqlStateMarker(new String(MysqlByteBufUtil.readNByte(byteBuf,5)));
         this.setErrorMessage(new String(MysqlByteBufUtil.readUtilEOF(byteBuf)));

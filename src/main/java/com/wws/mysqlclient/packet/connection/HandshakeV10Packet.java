@@ -1,18 +1,20 @@
 package com.wws.mysqlclient.packet.connection;
 
 import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
+import com.wws.mysqlclient.plugin.impl.CachingSHA2PasswordPlugin;
 import com.wws.mysqlclient.util.MysqlByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
 
+import java.util.Arrays;
+
 /**
  * 握手协议
- *
- * @see <a href="https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake">Handshake</a>
  *
  * @author wws
  * @version 1.0.0
  * @date 2019-09-09 14:46
+ * @see <a href="https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake">Handshake</a>
  **/
 @Data
 public class HandshakeV10Packet implements BaseSeriablizablePacket {
@@ -40,27 +42,27 @@ public class HandshakeV10Packet implements BaseSeriablizablePacket {
     /**
      * 2
      */
-    private short capabilityFlagsLower;
+    private int capabilityFlagsLower;
 
     /**
      * 1
      */
-    private byte charsetFlag;
+    private short charsetFlag;
 
     /**
      * 2
      */
-    private short serverStatusFlag;
+    private int serverStatusFlag;
 
     /**
      * 2
      */
-    private short capabilityFlagsUpper;
+    private int capabilityFlagsUpper;
 
     /**
      * 1
      */
-    private byte authPluginDataLength;
+    private short authPluginDataLength;
 
     /**
      * 10
@@ -84,13 +86,20 @@ public class HandshakeV10Packet implements BaseSeriablizablePacket {
         this.setConnectionId(byteBuf.readIntLE());
         this.setAuthPluginDataPart1(MysqlByteBufUtil.readNByte(byteBuf, 8));
         byteBuf.skipBytes(1);
-        this.setCapabilityFlagsLower(byteBuf.readShortLE());
+        this.setCapabilityFlagsLower(byteBuf.readUnsignedShortLE());
         this.setCharsetFlag(byteBuf.readByte());
-        this.setServerStatusFlag(byteBuf.readShortLE());
-        this.setCapabilityFlagsUpper(byteBuf.readShortLE());
-        this.setAuthPluginDataLength(byteBuf.readByte());
+        this.setServerStatusFlag(byteBuf.readUnsignedShortLE());
+        this.setCapabilityFlagsUpper(byteBuf.readUnsignedShortLE());
+        this.setAuthPluginDataLength(byteBuf.readUnsignedByte());
         this.setReserved(MysqlByteBufUtil.readNByte(byteBuf, 10));
-        this.setAuthPluginDataPart2(MysqlByteBufUtil.readNByte(byteBuf, Math.max(13, (int) this.getAuthPluginDataLength() - 8)));
+        byte[] bytes = MysqlByteBufUtil.readNByte(byteBuf, Math.max(13, (int) this.getAuthPluginDataLength() - 8));
+        int i = bytes.length - 1;
+        while (i >= 0 && bytes[i] == (byte) 0) {
+            i--;
+        }
+        System.out.println(CachingSHA2PasswordPlugin.dumpAsHex(getAuthPluginDataPart1(), getAuthPluginDataPart1().length));
+        this.setAuthPluginDataPart2(Arrays.copyOf(bytes, i + 1));
+        System.out.println(CachingSHA2PasswordPlugin.dumpAsHex(getAuthPluginDataPart2(), getAuthPluginDataPart2().length));
         this.setAuthPluginName(new String(MysqlByteBufUtil.readUtilNUL(byteBuf)));
     }
 
@@ -98,4 +107,5 @@ public class HandshakeV10Packet implements BaseSeriablizablePacket {
     public ByteBuf write() {
         return null;
     }
+
 }

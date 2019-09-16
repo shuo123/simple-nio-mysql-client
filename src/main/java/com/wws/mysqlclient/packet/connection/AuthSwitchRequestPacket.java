@@ -1,9 +1,12 @@
 package com.wws.mysqlclient.packet.connection;
 
 import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
+import com.wws.mysqlclient.plugin.impl.CachingSHA2PasswordPlugin;
 import com.wws.mysqlclient.util.MysqlByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
+
+import java.util.Arrays;
 
 /**
  * 切换验证方式server报文
@@ -21,7 +24,7 @@ public class AuthSwitchRequestPacket implements BaseSeriablizablePacket {
      * 1
      * 0xfe
      */
-    private byte status = (byte)0xfe;
+    private short status = 0xfe;
 
     /**
      * string.NUL
@@ -35,9 +38,15 @@ public class AuthSwitchRequestPacket implements BaseSeriablizablePacket {
 
     @Override
     public void read(ByteBuf byteBuf) {
-        this.setStatus(byteBuf.readByte());
+        this.setStatus(byteBuf.readUnsignedByte());
         this.setAuthMethodName(new String(MysqlByteBufUtil.readUtilNUL(byteBuf)));
-        this.setAuthMethodData(MysqlByteBufUtil.readUtilEOF(byteBuf));
+        byte[] bytes = MysqlByteBufUtil.readUtilEOF(byteBuf);
+        int i = bytes.length - 1;
+        while (i >= 0 && bytes[i] == (byte) 0) {
+            i--;
+        }
+        this.setAuthMethodData(Arrays.copyOf(bytes, i + 1));
+        CachingSHA2PasswordPlugin.dumpAsHex(getAuthMethodData(), getAuthMethodData().length);
     }
 
     @Override

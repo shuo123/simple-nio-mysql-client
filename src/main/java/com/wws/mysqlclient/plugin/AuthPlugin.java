@@ -13,7 +13,7 @@ public interface AuthPlugin {
 
     default byte[] xor(byte[] bytes1, byte[] bytes2){
         for(int i = 0; i < bytes1.length; i++){
-            bytes1[i] ^= bytes2[i];
+            bytes1[i] = (byte)(bytes1[i]^bytes2[i]);
         }
         return bytes1;
     }

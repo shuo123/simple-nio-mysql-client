@@ -71,7 +71,11 @@ public class HandshakeResponse41Packet implements BaseSeriablizablePacket {
 
         HandshakeResponse41Packet handshakeResponse41Packet = new HandshakeResponse41Packet();
 
-        int capabilityFlags = CapabilityFlags.CLIENT_CONNECT_WITH_DB
+        int capabilityFlags = CapabilityFlags.CLIENT_LONG_FLAG
+                | CapabilityFlags.CLIENT_FOUND_ROWS
+                | CapabilityFlags.CLIENT_LONG_PASSWORD
+                | CapabilityFlags.CLIENT_LOCAL_FILES
+                | CapabilityFlags.CLIENT_TRANSACTIONS
                 | CapabilityFlags.CLIENT_PROTOCOL_41
                 | CapabilityFlags.CLIENT_PLUGIN_AUTH;
 
@@ -87,7 +91,7 @@ public class HandshakeResponse41Packet implements BaseSeriablizablePacket {
         handshakeResponse41Packet.setReserved(new byte[23]);
         handshakeResponse41Packet.setUsername(username);
         handshakeResponse41Packet.setAuthResponse(AuthPluginContext.generate("caching_sha2_password", password.getBytes(StandardCharsets.UTF_8), seed));
-        handshakeResponse41Packet.setDatabase(database);
+//        handshakeResponse41Packet.setDatabase(database);
         handshakeResponse41Packet.setAuthPluginName("caching_sha2_password");
 
         return handshakeResponse41Packet;
@@ -97,7 +101,7 @@ public class HandshakeResponse41Packet implements BaseSeriablizablePacket {
         int len = 4 + 4 + 1 + 23;
         len += username.length() + 1;
         len += authResponse.length + 1;
-        len += database.length() + 1;
+//        len += database.length() + 1;
         len += authPluginName.length() + 1;
         return len;
     }
@@ -117,7 +121,7 @@ public class HandshakeResponse41Packet implements BaseSeriablizablePacket {
         byteBuf.writeBytes(this.getReserved());
         MysqlByteBufUtil.writeStringNUL(byteBuf, this.getUsername());
         MysqlByteBufUtil.writeStringNUL(byteBuf, this.getAuthResponse());
-        MysqlByteBufUtil.writeStringNUL(byteBuf, this.getDatabase());
+//        MysqlByteBufUtil.writeStringNUL(byteBuf, this.getDatabase());
         MysqlByteBufUtil.writeStringNUL(byteBuf, this.getAuthPluginName());
         return byteBuf;
     }

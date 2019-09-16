@@ -2,12 +2,10 @@ package com.wws.mysqlclient.handler;
 
 import com.wws.mysqlclient.enums.AttributeKeys;
 import com.wws.mysqlclient.config.MysqlConfig;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import com.wws.mysqlclient.packet.connection.HandshakeV10Packet;
 import com.wws.mysqlclient.packet.connection.HandshakeResponse41Packet;
-import com.wws.mysqlclient.packet.MysqlPacket;
 
 /**
  * 握手协议处理器
@@ -26,7 +24,9 @@ public class HandshakeHandler extends SimpleChannelInboundHandler<HandshakeV10Pa
 
         channelHandlerContext.pipeline().remove(HandshakeHandler.class);
         channelHandlerContext.pipeline().remove(HandshakeDecoder.class);
+        channelHandlerContext.pipeline().remove(InboundPrintHandler.class);
         channelHandlerContext.pipeline().addLast(new AuthDecoder());
         channelHandlerContext.pipeline().addLast(new AuthSwitchHandler());
+        channelHandlerContext.pipeline().addLast(new InboundPrintHandler());
     }
 }

@@ -4,6 +4,7 @@ import com.wws.mysqlclient.plugin.AuthPlugin;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * @see <a href="https://dev.mysql.com/doc/internals/en/secure-password-authentication.html#packet-Authentication::Native41">Native41</a>
@@ -25,10 +26,9 @@ public class MysqlNativePasswordPlugin implements AuthPlugin {
             byte[] dig2 = messageDigest.digest(dig1);
             messageDigest.reset();
 
-            byte[] bytes = new byte[seed.length + dig2.length];
-            System.arraycopy(seed, 0, bytes, 0, seed.length);
-            System.arraycopy(dig2, 0, bytes, seed.length, dig2.length);
-            byte[] dig3 = messageDigest.digest(bytes);
+            messageDigest.update(seed);
+            messageDigest.update(dig2);
+            byte[] dig3 = messageDigest.digest();
 
             return xor(dig1, dig3);
         }catch (NoSuchAlgorithmException e){

@@ -24,7 +24,7 @@ public class OKPacket implements BaseSeriablizablePacket {
      * INT <1>
      * [00]或[fe]OK包头
      */
-    private byte header;
+    private short header;
 
     /**
      * INT <lenenc>
@@ -58,7 +58,7 @@ public class OKPacket implements BaseSeriablizablePacket {
 
     @Override
     public void read(ByteBuf byteBuf) {
-        this.setHeader(byteBuf.readByte());
+        this.setHeader(byteBuf.readUnsignedByte());
         this.setAffectRow(MysqlByteBufUtil.readLengthEncodedInteger(byteBuf));
         this.setLastInsertId(MysqlByteBufUtil.readLengthEncodedInteger(byteBuf));
         this.setStatusFlags(byteBuf.readShortLE());

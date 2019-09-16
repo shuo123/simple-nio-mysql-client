@@ -29,7 +29,7 @@ public class AuthSwitchHandler extends SimpleChannelInboundHandler<AuthSwitchReq
 
         byte[] authMethodData = authSwitchRequestPacket.getAuthMethodData();
         String authMethodName = authSwitchRequestPacket.getAuthMethodName();
-        byte[] authpluginResponse = AuthPluginContext.generate(authMethodName, password.getBytes(StandardCharsets.UTF_8), authMethodData);
+         byte[] authpluginResponse = AuthPluginContext.generate(authMethodName, password.getBytes(StandardCharsets.UTF_8), authMethodData);
         AuthSwitchResponsePacket authSwitchResponsePacket = new AuthSwitchResponsePacket();
         authSwitchResponsePacket.setAuthPluginResponse(authpluginResponse);
 
