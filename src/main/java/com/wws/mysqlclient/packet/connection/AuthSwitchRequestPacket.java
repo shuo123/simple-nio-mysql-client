@@ -46,7 +46,6 @@ public class AuthSwitchRequestPacket implements BaseSeriablizablePacket {
             i--;
         }
         this.setAuthMethodData(Arrays.copyOf(bytes, i + 1));
-        CachingSHA2PasswordPlugin.dumpAsHex(getAuthMethodData(), getAuthMethodData().length);
     }
 
     @Override
