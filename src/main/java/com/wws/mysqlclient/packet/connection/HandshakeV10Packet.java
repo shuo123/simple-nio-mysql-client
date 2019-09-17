@@ -97,9 +97,7 @@ public class HandshakeV10Packet implements BaseSeriablizablePacket {
         while (i >= 0 && bytes[i] == (byte) 0) {
             i--;
         }
-        System.out.println(CachingSHA2PasswordPlugin.dumpAsHex(getAuthPluginDataPart1(), getAuthPluginDataPart1().length));
         this.setAuthPluginDataPart2(Arrays.copyOf(bytes, i + 1));
-        System.out.println(CachingSHA2PasswordPlugin.dumpAsHex(getAuthPluginDataPart2(), getAuthPluginDataPart2().length));
         this.setAuthPluginName(new String(MysqlByteBufUtil.readUtilNUL(byteBuf)));
     }
 
