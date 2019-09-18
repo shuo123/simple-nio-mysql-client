@@ -1,7 +1,8 @@
-package com.wws.mysqlclient.handler;
+package com.wws.mysqlclient.handler.connection;
 
 import com.wws.mysqlclient.enums.AttributeKeys;
 import com.wws.mysqlclient.config.MysqlConfig;
+import com.wws.mysqlclient.handler.InboundPrintHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import com.wws.mysqlclient.packet.connection.HandshakeV10Packet;

@@ -1,4 +1,4 @@
-package com.wws.mysqlclient.handler;
+package com.wws.mysqlclient.handler.connection;
 
 import com.wws.mysqlclient.config.MysqlConfig;
 import com.wws.mysqlclient.enums.AttributeKeys;

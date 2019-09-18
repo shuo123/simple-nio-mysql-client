@@ -1,7 +1,6 @@
 package com.wws.mysqlclient.packet.connection;
 
 import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
-import com.wws.mysqlclient.plugin.impl.CachingSHA2PasswordPlugin;
 import com.wws.mysqlclient.util.MysqlByteBufUtil;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;

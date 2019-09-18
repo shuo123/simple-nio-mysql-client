@@ -2,6 +2,7 @@ package com.wws.mysqlclient.packet.connection;
 
 import com.wws.mysqlclient.config.MysqlConfig;
 import com.wws.mysqlclient.enums.CapabilityFlags;
+import com.wws.mysqlclient.packet.BaseLengthPacket;
 import com.wws.mysqlclient.packet.BaseSeriablizablePacket;
 import com.wws.mysqlclient.plugin.AuthPluginContext;
 import com.wws.mysqlclient.util.MysqlByteBufUtil;
@@ -20,7 +21,7 @@ import java.nio.charset.StandardCharsets;
  * @see <a href="https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::HandshakeResponse ">HandshakeResponse</a>
  **/
 @Data
-public class HandshakeResponse41Packet implements BaseSeriablizablePacket {
+public class HandshakeResponse41Packet implements BaseSeriablizablePacket, BaseLengthPacket {
 
     /**
      * 4
@@ -102,7 +103,8 @@ public class HandshakeResponse41Packet implements BaseSeriablizablePacket {
         return handshakeResponse41Packet;
     }
 
-    private int length() {
+    @Override
+    public int length() {
         int len = 4 + 4 + 1 + 23;
         len += username.length() + 1;
         len += authResponse.length + 1;

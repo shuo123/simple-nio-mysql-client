@@ -20,6 +20,7 @@ public class MysqlPacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+        System.out.println(byteBuf);
         MysqlPacket mysqlPacket = new MysqlPacket();
         mysqlPacket.read(byteBuf);
         list.add(mysqlPacket);

@@ -73,10 +73,10 @@ public class MysqlByteBufUtil {
 
     /**
      * 读取LengthEncodedInteger
+     * @see <a href="https://dev.mysql.com/doc/internals/en/integer.html#packet-Protocol::LengthEncodedInteger">LengthEncodedInteger</a>
      *
      * @param byteBuf ByteBuf
      * @return LengthEncodedInteger
-     * @see <a href="https://dev.mysql.com/doc/internals/en/integer.html#packet-Protocol::LengthEncodedInteger">LengthEncodedInteger</a>
      */
     public static long readLengthEncodedInteger(ByteBuf byteBuf) {
         short b = byteBuf.readUnsignedByte();
@@ -93,16 +93,33 @@ public class MysqlByteBufUtil {
         return 0;
     }
 
-    public static void writeLengthEncodedInteger(ByteBuf byteBuf, long i){
-        if(i < LENGTH_ENCODED_FIX_251){
-            byteBuf.writeByte((byte)i);
-        }else if(i < (1 << 16)){
+    /**
+     * 读取lengthEncodedString
+     *
+     * @param byteBuf ByteBuf
+     * @return String
+     */
+    public static String readLengthEncodedString(ByteBuf byteBuf) {
+        long len = readLengthEncodedInteger(byteBuf);
+        return new String(readNByte(byteBuf, (int) len), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 写入lengthEncodedInteger
+     *
+     * @param byteBuf ByteBuf
+     * @param i       long
+     */
+    public static void writeLengthEncodedInteger(ByteBuf byteBuf, long i) {
+        if (i < LENGTH_ENCODED_FIX_251) {
+            byteBuf.writeByte((byte) i);
+        } else if (i < (1 << 16)) {
             byteBuf.writeByte(LENGTH_ENCODED_FIX_252);
-            byteBuf.writeShortLE((short)i);
-        }else if(i < (1 << 24)){
+            byteBuf.writeShortLE((short) i);
+        } else if (i < (1 << 24)) {
             byteBuf.writeByte(LENGTH_ENCODED_FIX_253);
-            byteBuf.writeMediumLE((int)i);
-        } else{
+            byteBuf.writeMediumLE((int) i);
+        } else {
             byteBuf.writeByte(LENGTH_ENCODED_FIX_254);
             byteBuf.writeLongLE(i);
         }
@@ -139,6 +156,16 @@ public class MysqlByteBufUtil {
     public static void writeStringNUL(ByteBuf byteBuf, byte[] bytes) {
         byteBuf.writeBytes(bytes);
         byteBuf.writeByte((byte) 0);
+    }
+
+    /**
+     * 写入string
+     *
+     * @param byteBuf ByteBuf
+     * @param str     String
+     */
+    public static void writeString(ByteBuf byteBuf, String str) {
+        byteBuf.writeBytes(str.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

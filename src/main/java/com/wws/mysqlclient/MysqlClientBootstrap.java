@@ -3,6 +3,8 @@ package com.wws.mysqlclient;
 import com.wws.mysqlclient.config.MysqlConfig;
 import com.wws.mysqlclient.enums.AttributeKeys;
 import com.wws.mysqlclient.handler.*;
+import com.wws.mysqlclient.handler.connection.HandshakeDecoder;
+import com.wws.mysqlclient.handler.connection.HandshakeHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

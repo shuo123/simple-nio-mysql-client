@@ -3,7 +3,6 @@ package com.wws.mysqlclient.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -40,7 +39,7 @@ public class MysqlPacket implements BaseSeriablizablePacket {
     public void read(ByteBuf byteBuf) {
         this.setPayloadLength(byteBuf.readMediumLE());
         this.setSequenceId(byteBuf.readByte());
-        this.setPayload(byteBuf.readBytes(this.getPayloadLength()));
+        this.setPayload(byteBuf.readBytes(payloadLength));
     }
 
     @Override
