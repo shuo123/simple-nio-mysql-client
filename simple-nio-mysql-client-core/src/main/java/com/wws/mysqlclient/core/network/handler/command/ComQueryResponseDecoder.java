@@ -39,6 +39,7 @@ public class ComQueryResponseDecoder extends SimpleChannelInboundHandler<MysqlPa
                 if(header == 0xfe){
                     comQueryResponsePacket.setRowReadOver(true);
                     futurePacket.getCountDownLatch().countDown();
+                    ctx.pipeline().remove(this);
                 }else {
                     ResultsetRowPacket packet = new ResultsetRowPacket();
                     packet.read(payload);

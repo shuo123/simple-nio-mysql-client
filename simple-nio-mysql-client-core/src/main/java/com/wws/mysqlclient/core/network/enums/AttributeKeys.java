@@ -5,6 +5,7 @@ import com.wws.mysqlclient.core.config.MysqlConfig;
 import com.wws.mysqlclient.protocol.packet.command.ComQueryResponsePacket;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.DefaultPromise;
+import io.netty.util.concurrent.EventExecutor;
 
 /**
  * @author wws
@@ -17,4 +18,5 @@ public class AttributeKeys {
     public static final AttributeKey<MysqlConfig> CONFIG_KEY = AttributeKey.newInstance("config");
     public static final AttributeKey<FuturePacket<ComQueryResponsePacket>> COM_QUERY_RESPONSE_PACKET_KEY = AttributeKey.newInstance("comQueryResponsePacket");
     public static final AttributeKey<DefaultPromise<Void>> CONNECTION = AttributeKey.newInstance("connection");
+    public static final AttributeKey<EventExecutor> EVENTEXECUTOR = AttributeKey.newInstance("eventExecutor");
 }

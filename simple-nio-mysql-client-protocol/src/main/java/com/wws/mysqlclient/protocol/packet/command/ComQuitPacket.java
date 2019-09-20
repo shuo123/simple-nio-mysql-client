@@ -4,6 +4,7 @@ import com.wws.mysqlclient.protocol.packet.BaseLengthPacket;
 import com.wws.mysqlclient.protocol.packet.BaseSeriablizablePacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import lombok.ToString;
 
 /**
  * 断开连接报文
@@ -13,6 +14,7 @@ import io.netty.buffer.ByteBufAllocator;
  * @version 1.0.0
  * @date 2019-09-17 15:45
  **/
+@ToString
 public class ComQuitPacket implements BaseLengthPacket, BaseSeriablizablePacket {
 
     private byte commandId = 0x01;

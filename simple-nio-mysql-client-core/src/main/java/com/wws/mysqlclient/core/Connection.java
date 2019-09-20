@@ -1,9 +1,10 @@
 package com.wws.mysqlclient.core;
 
 import com.wws.mysqlclient.core.network.enums.AttributeKeys;
+import com.wws.mysqlclient.protocol.packet.command.ComQuitPacket;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.*;
 
 /**
  * @author wws
@@ -27,7 +28,15 @@ public class Connection {
     }
 
     public ChannelFuture close(){
-        return channel.closeFuture();
+        ComQuitPacket comQuitPacket = new ComQuitPacket();
+        channel.attr(AttributeKeys.SEQUENCE_ID_KEY).set((byte) -1);
+        ChannelFuture channelFuture = channel.writeAndFlush(comQuitPacket);
+        channelFuture.addListener(future -> channel.close().sync());
+        return channelFuture;
+    }
+
+    private EventExecutor getEventExecutor(){
+        return channel.attr(AttributeKeys.EVENTEXECUTOR).get();
     }
 
 }

@@ -13,17 +13,11 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.util.concurrent.*;
-import org.omg.PortableInterceptor.INACTIVE;
+import io.netty.util.concurrent.DefaultEventExecutor;
+import io.netty.util.concurrent.DefaultPromise;
+import io.netty.util.concurrent.EventExecutor;
 
 import java.nio.ByteOrder;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author wws
@@ -32,12 +26,13 @@ import java.util.concurrent.TimeoutException;
  **/
 public class ConnectionFactory {
 
-    private static volatile ConnectionFactory INSTATNCE;
+    private static volatile ConnectionFactory INSTANCE;
 
     private Bootstrap bootstrap;
     private NioEventLoopGroup group;
+    private EventExecutor eventExecutor;
 
-    public ConnectionFactory() {
+    private ConnectionFactory() {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -57,17 +52,18 @@ public class ConnectionFactory {
                         ;
                     }
                 });
+        eventExecutor = new DefaultEventExecutor();
     }
 
-    public static ConnectionFactory getInstance(){
-        if(INSTATNCE == null){
-            synchronized (ConnectionFactory.class){
-                if(INSTATNCE == null){
-                    return new ConnectionFactory();
+    public static ConnectionFactory getInstance() {
+        if (INSTANCE == null) {
+            synchronized (ConnectionFactory.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new ConnectionFactory();
                 }
             }
         }
-        return INSTATNCE;
+        return INSTANCE;
     }
 
     public Connection getConnection(MysqlConfig config) throws InterruptedException {
@@ -75,10 +71,11 @@ public class ConnectionFactory {
         Channel channel = channelFuture.channel();
         channel.attr(AttributeKeys.CONFIG_KEY).setIfAbsent(config);
         channel.attr(AttributeKeys.CONNECTION).setIfAbsent(new DefaultPromise<>(new DefaultEventExecutor()));
+        channel.attr(AttributeKeys.EVENTEXECUTOR).setIfAbsent(eventExecutor);
         return new Connection(channel);
     }
 
-    public void destory(){
+    public void destory() {
         group.shutdownGracefully();
     }
 

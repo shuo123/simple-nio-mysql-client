@@ -9,8 +9,6 @@ import io.netty.util.concurrent.Future;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 /**
  * @author wws
  * @version 1.0.0
@@ -19,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 public class ConnectionTest {
 
     @Test
-    public void test() throws ExecutionException, InterruptedException {
+    public void test() throws Exception {
         MysqlConfig config = new MysqlConfig();
         config.setDatabase("test");
         config.setUsername("root");
